@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiperbanco · Suporte · Maio 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #080b12;
+  --surface: #0e1320;
+  --surface2: #141929;
+  --surface3: #1b2238;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8edf5;
+  --muted: #4a5568;
+  --muted2: #718096;
+  --accent: #00d4ff;
+  --accent2: #0099cc;
+  --green: #00e5a0;
+  --amber: #ffb800;
+  --red: #ff4757;
+  --purple: #9b6dff;
+  --pink: #ff6b9d;
+  --orange: #ff8c42;
+  --display: 'Syne', sans-serif;
+  --body: 'IBM Plex Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --r: 10px;
+  --r2: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+/* ─── NOISE TEXTURE ─── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+/* ─── ACCENT GLOW ─── */
+.glow-orb{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.04) 0%,transparent 70%);top:-200px;right:-200px;pointer-events:none;z-index:0}
+.glow-orb2{position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(155,109,255,0.04) 0%,transparent 70%);bottom:-100px;left:-100px;pointer-events:none;z-index:0}
+
+/* ─── HEADER ─── */
+.header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:62px;background:rgba(8,11,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);gap:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+.brand-name{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:0.02em}
+.brand-sub{font-size:11px;color:var(--muted2);font-family:var(--mono)}
+.header-center{display:flex;gap:4px}
+.tab-btn{background:none;border:none;color:var(--muted2);font-family:var(--body);font-size:13px;font-weight:500;padding:6px 16px;border-radius:20px;cursor:pointer;transition:all .2s}
+.tab-btn:hover{color:var(--text);background:var(--surface2)}
+.tab-btn.active{color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15)}
+.header-right{display:flex;align-items:center;gap:12px}
+.badge-period{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:11px;color:var(--muted2)}
+.live-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-family:var(--mono)}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,0.4)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(0,229,160,0)}}
+
+/* ─── LAYOUT ─── */
+.main{padding:28px 32px;max-width:1440px;margin:0 auto;position:relative;z-index:1}
+.page{display:none}.page.active{display:block}
+
+/* ─── SECTION TITLE ─── */
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── KPI GRID ─── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s,transform .15s}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kpi-accent{position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r2) var(--r2) 0 0}
+.kpi-icon{font-size:20px;margin-bottom:10px;opacity:.7}
+.kpi-label{font-size:10px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.kpi-value{font-family:var(--display);font-size:32px;font-weight:700;line-height:1;letter-spacing:-0.02em}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.kpi-delta{font-size:11px;margin-top:4px;font-family:var(--mono)}
+.kpi.c-blue .kpi-accent{background:var(--accent)}
+.kpi.c-blue .kpi-value{color:var(--accent)}
+.kpi.c-green .kpi-accent{background:var(--green)}
+.kpi.c-green .kpi-value{color:var(--green)}
+.kpi.c-amber .kpi-accent{background:var(--amber)}
+.kpi.c-amber .kpi-value{color:var(--amber)}
+.kpi.c-red .kpi-accent{background:var(--red)}
+.kpi.c-red .kpi-value{color:var(--red)}
+.kpi.c-purple .kpi-accent{background:var(--purple)}
+.kpi.c-purple .kpi-value{color:var(--purple)}
+
+/* ─── INSIGHT BANNER ─── */
+.insights{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.insight{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;transition:border-color .2s}
+.insight:hover{border-color:var(--border2)}
+.insight-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.insight-icon.warn{background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.2)}
+.insight-icon.danger{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.2)}
+.insight-icon.good{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2)}
+.insight-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.insight-desc{font-size:11px;color:var(--muted2);line-height:1.5}
+.insight-val{font-family:var(--mono);font-size:14px;font-weight:500;margin-top:4px}
+.insight-val.warn{color:var(--amber)}
+.insight-val.danger{color:var(--red)}
+.insight-val.good{color:var(--green)}
+
+/* ─── CHART GRID ─── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3-1{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:14px;margin-bottom:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px 22px;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.card-title{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+.card-value{font-family:var(--display);font-size:22px;font-weight:600;margin-top:2px}
+.card-tag{font-size:10px;padding:3px 8px;border-radius:4px;font-family:var(--mono);background:var(--surface3);color:var(--muted2);border:1px solid var(--border)}
+
+/* ─── LEGEND ─── */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
+.ldot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ─── CLIENT BARS ─── */
+.client-rows{padding:0}
+.client-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.client-row:last-child{border:none}
+.c-rank{font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0}
+.c-name{flex:1;font-size:13px;color:var(--text);font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-bar-wrap{width:90px;height:4px;background:var(--surface3);border-radius:2px;flex-shrink:0}
+.c-bar{height:4px;border-radius:2px;background:var(--accent);transition:width .6s ease}
+.c-count{font-family:var(--mono);font-size:12px;color:var(--accent);width:28px;text-align:right;flex-shrink:0}
+.c-avg{font-family:var(--mono);font-size:10px;color:var(--muted);width:46px;text-align:right;flex-shrink:0}
+
+/* ─── SUBCAT BARS ─── */
+.subcat-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.subcat-row:last-child{border:none}
+.subcat-name{flex:1;font-size:12px;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subcat-bar-wrap{width:100px;height:3px;background:var(--surface3);border-radius:2px;flex-shrink:0}
+.subcat-bar{height:3px;border-radius:2px}
+.subcat-count{font-family:var(--mono);font-size:11px;color:var(--muted2);width:24px;text-align:right;flex-shrink:0}
+
+/* ─── TABLE ─── */
+.table-wrap{overflow-x:auto;margin-top:4px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);font-weight:400;white-space:nowrap}
+td{padding:10px 12px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:hover td{background:rgba(255,255,255,0.02)}
+tr:last-child td{border:none}
+.tid{font-family:var(--mono);font-size:10px;color:var(--accent)}
+.badge{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.b-alta{background:rgba(255,71,87,.12);color:#ff8a94;border:1px solid rgba(255,71,87,.2)}
+.b-media{background:rgba(255,184,0,.12);color:#ffd166;border:1px solid rgba(255,184,0,.2)}
+.b-sem{background:rgba(74,85,104,.2);color:var(--muted2);border:1px solid var(--border)}
+.h-fast{color:var(--green);font-family:var(--mono);font-size:11px}
+.h-mid{color:var(--amber);font-family:var(--mono);font-size:11px}
+.h-slow{color:var(--red);font-family:var(--mono);font-size:11px}
+
+/* ─── FILTER BAR ─── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.fbtn{background:var(--surface2);border:1px solid var(--border);color:var(--muted2);font-family:var(--body);font-size:12px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .15s}
+.fbtn:hover{border-color:var(--border2);color:var(--text)}
+.fbtn.active{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:var(--accent)}
+.fsearch{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--body);font-size:12px;padding:5px 14px;border-radius:20px;outline:none;width:220px;margin-left:auto}
+.fsearch:focus{border-color:rgba(0,212,255,.3)}
+.fsearch::placeholder{color:var(--muted)}
+
+/* ─── SCROLL BAR ─── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease forwards;opacity:0}
+.fade-up:nth-child(1){animation-delay:.05s}
+.fade-up:nth-child(2){animation-delay:.1s}
+.fade-up:nth-child(3){animation-delay:.15s}
+.fade-up:nth-child(4){animation-delay:.2s}
+.fade-up:nth-child(5){animation-delay:.25s}
+.fade-up:nth-child(6){animation-delay:.3s}
+
+/* ─── FOOTER ─── */
+.footer{border-top:1px solid var(--border);padding:14px 32px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted);position:relative;z-index:1}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .grid-3{grid-template-columns:1fr 1fr}
+  .grid-3-1,.grid-1-2{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .main{padding:16px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .grid-2,.grid-3,.grid-3-1,.grid-1-2{grid-template-columns:1fr}
+  .header{padding:0 16px}
+  .header-center{display:none}
+}
+
+/* ─── HEAT MAP ─── */
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.hday{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--muted);cursor:default;transition:transform .1s;position:relative}
+.hday:hover{transform:scale(1.15);z-index:2}
+.hday .tooltip{position:absolute;bottom:calc(100%+6px);left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:10px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.hday:hover .tooltip{opacity:1}
+</style>
+</head>
+<body>
+<div class="glow-orb"></div>
+<div class="glow-orb2"></div>
+
+<header class="header">
+  <div class="brand">
+    <div class="brand-mark">H</div>
+    <div>
+      <div class="brand-name">Hiperbanco</div>
+      <div class="brand-sub">Central de Suporte</div>
+    </div>
+  </div>
+  <nav class="header-center">
+    <button class="tab-btn active" onclick="showPage('overview',this)">Visão Geral</button>
+    <button class="tab-btn" onclick="showPage('tickets',this)">Tickets</button>
+    <button class="tab-btn" onclick="showPage('clientes',this)">Clientes</button>
+    <button class="tab-btn" onclick="showPage('tempo',this)">Tempo & SLA</button>
+  </nav>
+  <div class="header-right">
+    <span class="badge-period">01 – 29 Mai 2026</span>
+    <span class="live-badge"><span class="live-dot"></span>Ao vivo</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ PAGE 1 — OVERVIEW ═══════════════════════════════ -->
+<div class="main">
+<div id="page-overview" class="page active">
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi c-blue fade-up">
+      <div class="kpi-accent"></div>
+  <!-- KPIs -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
+    <div class="kpi c-blue fade-up">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Tickets Fechados</div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-sub">Maio 2026</div>
+    </div>
+    <div class="kpi c-amber fade-up">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Tempo Médio</div>
+      <div class="kpi-value" id="kpi-avg">—</div>
+      <div class="kpi-sub">Horas até fechar</div>
+    </div>
+    <div class="kpi c-green fade-up">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Mais Rápido</div>
+      <div class="kpi-value" id="kpi-min">—</div>
+      <div class="kpi-sub">Menor resolução</div>
+    </div>
+    <div class="kpi c-red fade-up">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Mais Lento</div>
+      <div class="kpi-value" id="kpi-max">—</div>
+      <div class="kpi-sub">Maior resolução</div>
+    </div>
+    <div class="kpi c-purple fade-up">
+      <div class="kpi-accent"></div>
+      <div class="kpi-label">Clientes</div>
+      <div class="kpi-value" id="kpi-clients">—</div>
+      <div class="kpi-sub">Contas atendidas</div>
+    </div>
+    <div class="kpi fade-up" style="border-color:rgba(0,229,160,0.25);background:rgba(0,229,160,0.06)">
+      <div class="kpi-accent" style="background:linear-gradient(90deg,#00e5a0,#00d4ff)"></div>
+      <div class="kpi-label" style="color:#00e5a0">CSAT — Satisfação</div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div class="kpi-value" style="color:#00e5a0;font-size:36px">95%</div>
+        <span style="font-size:22px">😊</span>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
+        <span style="font-size:10px;font-family:var(--mono);color:#00e5a0">● Bom 95% (19)</span>
+        <span style="font-size:10px;font-family:var(--mono);color:#ff4757">● Baixo 5% (1)</span>
+      </div>
+      <div class="kpi-sub" style="margin-top:4px">20 avaliações · Mês atual</div>
+    </div>
+  </div>
+
+  <!-- Insights — clientes por volume -->
+  <div class="section-label">Clientes que mais abriram tickets em maio</div>
+  <div class="insights" id="client-insights"></div>
+
+  <!-- Charts row 1 -->
+  <div class="grid-3-1">
+    <div class="card fade-up">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Fechamentos por dia — Maio 2026</div>
+          <div class="card-value" id="peak-day">Pico: —</div>
+        </div>
+        <div class="card-tag" id="daily-total-tag">— tickets</div>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="cDaily" role="img" aria-label="Fechamentos por dia"></canvas></div>
+    </div>
+    <div class="card fade-up">
+      <div class="card-header"><div><div class="card-title">Prioridade</div></div></div>
+      <div class="legend" id="prio-legend"></div>
+      <div style="position:relative;height:170px"><canvas id="cPrio" role="img" aria-label="Distribuição de prioridade"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Charts row 2 -->
+  <div class="grid-2">
+    <div class="card fade-up">
+      <div class="card-header"><div><div class="card-title">Volume por categoria</div><div class="card-value" id="cat-top">—</div></div></div>
+      <div style="position:relative;height:220px"><canvas id="cCat" role="img" aria-label="Tickets por categoria"></canvas></div>
+    </div>
+    <div class="card fade-up">
+      <div class="card-header"><div><div class="card-title">Prazo de resolução — do abertura ao fechamento</div></div></div>
+      <div style="position:relative;height:220px"><canvas id="cRes" role="img" aria-label="Prazo de resolução"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CSAT Detail -->
+  <div class="section-label">Avaliação de satisfação — CSAT</div>
+  <div class="card fade-up" style="border-color:rgba(0,229,160,0.2);margin-bottom:14px">
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center">
+      <!-- Score principal -->
+      <div style="text-align:center;padding:8px 24px;border-right:1px solid var(--border)">
+        <div style="font-size:52px;line-height:1;margin-bottom:6px">😊</div>
+        <div style="font-family:var(--display);font-size:48px;font-weight:800;color:#00e5a0;line-height:1">95%</div>
+        <div style="font-size:11px;color:var(--muted2);margin-top:6px;font-family:var(--mono)">CLASSIFICAÇÃO GERAL</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">20 avaliações · Mês atual</div>
+      </div>
+      <!-- Barras -->
+      <div style="display:flex;flex-direction:column;gap:14px;padding:4px 0">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+            <span style="color:#00e5a0;font-weight:500">😊 Bom</span>
+            <span style="font-family:var(--mono);color:var(--muted2)">19 avaliações · 95%</span>
+          </div>
+          <div style="height:10px;background:var(--surface3);border-radius:5px;overflow:hidden">
+            <div style="width:95%;height:100%;background:linear-gradient(90deg,#00e5a0,#00d4ff);border-radius:5px;animation:barGrow .8s ease forwards"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+            <span style="color:#ffb800;font-weight:500">😐 Médio</span>
+            <span style="font-family:var(--mono);color:var(--muted2)">0 avaliações · 0%</span>
+          </div>
+          <div style="height:10px;background:var(--surface3);border-radius:5px;overflow:hidden">
+            <div style="width:0%;height:100%;background:#ffb800;border-radius:5px"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+            <span style="color:#ff4757;font-weight:500">😞 Baixo</span>
+            <span style="font-family:var(--mono);color:var(--muted2)">1 avaliação · 5%</span>
+          </div>
+          <div style="height:10px;background:var(--surface3);border-radius:5px;overflow:hidden">
+            <div style="width:5%;height:100%;background:#ff4757;border-radius:5px"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Insight lateral -->
+      <div style="text-align:center;padding:8px 24px;border-left:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Tendência</div>
+        <div style="font-size:28px;color:#00e5a0">▲</div>
+        <div style="font-family:var(--mono);font-size:13px;color:#00e5a0;font-weight:500">+0%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:6px">vs. mês anterior</div>
+      </div>
+    </div>
+  </div>
+  <style>@keyframes barGrow{from{width:0}to{width:95%}}</style>
+
+</div>
+
+<!-- ═══════════════════════════════ PAGE 2 — TICKETS ═══════════════════════════════ -->
+<div id="page-tickets" class="page">
+  <div class="filter-bar">
+    <span class="filter-label">Prioridade:</span>
+    <button class="fbtn active" onclick="setFilter('all',this)">Todos</button>
+    <button class="fbtn" onclick="setFilter('Alta',this)">Alta</button>
+    <button class="fbtn" onclick="setFilter('Média',this)">Média</button>
+    <button class="fbtn" onclick="setFilter('Sem prioridade',this)">Sem prioridade</button>
+    <input class="fsearch" type="text" placeholder="🔍  Buscar por assunto ou cliente..." oninput="filterSearch(this.value)" id="search-inp">
+  </div>
+
+  <div class="grid-3-1" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Top subcategorias</div></div></div>
+      <div id="subcat-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Por categoria</div></div></div>
+      <div style="position:relative;height:280px"><canvas id="cCat2" role="img" aria-label="Tickets por categoria"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Todos os tickets</div></div>
+      <div class="card-tag" id="table-count">— registros</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Assunto</th><th>Categoria</th><th>Cliente</th>
+          <th>Prioridade</th><th>Abertura</th><th>Fechamento</th><th>Prazo</th>
+        </tr></thead>
+        <tbody id="tickets-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE 3 — CLIENTES ═══════════════════════════════ -->
+<div id="page-clientes" class="page">
+  <div class="grid-1-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Tickets por cliente</div><div class="card-value" id="client-top-val">—</div></div></div>
+      <div class="client-rows" id="client-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Volume por cliente — top 10</div></div></div>
+      <div style="position:relative;height:320px"><canvas id="cClients" role="img" aria-label="Tickets por cliente"></canvas></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Tempo médio de resolução por cliente</div><div class="card-value" style="font-size:14px;color:var(--muted2)">Clientes com 2+ tickets</div></div></div>
+      <div style="position:relative;height:260px"><canvas id="cClientRes" role="img" aria-label="Resolução média por cliente"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Distribuição por categoria — cliente selecionado</div></div></div>
+      <div style="margin-bottom:12px">
+        <select id="client-select" onchange="updateClientCat()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:12px;padding:6px 12px;border-radius:8px;outline:none;width:100%">
+          <option value="">Selecione um cliente...</option>
+        </select>
+      </div>
+      <div style="position:relative;height:210px"><canvas id="cClientCat" role="img" aria-label="Categorias do cliente"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PAGE 4 — TEMPO & SLA ═══════════════════════════════ -->
+<div id="page-tempo" class="page">
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+    <div class="kpi c-green"><div class="kpi-accent"></div><div class="kpi-label">Mesmo dia</div><div class="kpi-value" id="sla-day">—</div><div class="kpi-sub">< 24 horas</div></div>
+    <div class="kpi c-blue"><div class="kpi-accent"></div><div class="kpi-label">1 a 3 dias</div><div class="kpi-value" id="sla-3d">—</div><div class="kpi-sub">24 – 72h</div></div>
+    <div class="kpi c-amber"><div class="kpi-accent"></div><div class="kpi-label">3 a 14 dias</div><div class="kpi-value" id="sla-14d">—</div><div class="kpi-sub">72h – 336h</div></div>
+    <div class="kpi c-red"><div class="kpi-accent"></div><div class="kpi-label">Mais de 14 dias</div><div class="kpi-value" id="sla-over">—</div><div class="kpi-sub">> 336 horas</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Tempo médio de resolução por categoria</div></div></div>
+      <div style="position:relative;height:300px"><canvas id="cCatRes" role="img" aria-label="Resolução por categoria"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Dispersão de resolução — tickets individuais</div><div style="font-size:11px;color:var(--muted2);margin-top:2px">Cada ponto = 1 ticket · Cor = categoria</div></div></div>
+      <div style="position:relative;height:300px"><canvas id="cScatter" role="img" aria-label="Dispersão de resolução"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Os 10 tickets que mais demoraram para fechar</div></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Assunto</th><th>Cliente</th><th>Categoria</th><th>Aberto em</th><th>Fechado em</th><th>Prazo</th></tr></thead>
+        <tbody id="slowest-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer class="footer">
+  <span>Hiperbanco · Suporte Hiperbanco · Zoho Desk</span>
+  <span id="footer-time"></span>
+</footer>
+
+<script>
+const DATA = [{"id":"6527","subject":"Aumento de Limite da Conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Health Cash","createdTime":"2026-04-20","closedTime":"2026-05-04","resolutionHours":334.6},{"id":"6594","subject":"AUTENTICATOR COM ERRO","status":"Fechado","priority":"Média","category":"Backoffice","subCategory":"Dúvidas/Outros","channel":"Web","client":"Apex Pay","createdTime":"2026-04-28","closedTime":"2026-05-04","resolutionHours":136.1},{"id":"6598","subject":"Erica Regina Brito Machado- cadast . novo PIN","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"PIN","channel":"Web","client":"NityBank","createdTime":"2026-04-29","closedTime":"2026-05-04","resolutionHours":118.9},{"id":"6618","subject":"APP temporariamente indisponível","status":"Fechado","priority":"Média","category":"Aplicativo","subCategory":"Aplicativo fora do ar","channel":"Web","client":"Vellox Bank","createdTime":"2026-05-04","closedTime":"2026-05-04","resolutionHours":0.9},{"id":"6612","subject":"Falha ao transferir p2p","status":"Fechado","priority":"Sem prioridade","category":"P2P","subCategory":"Falha na Transação de PIX","channel":"Web","client":"Health Cash","createdTime":"2026-05-04","closedTime":"2026-05-04","resolutionHours":7.5},{"id":"6559","subject":"Erro ao efetuar PIX","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Axiis","createdTime":"2026-04-24","closedTime":"2026-05-05","resolutionHours":264.4},{"id":"6625","subject":"ERRO NO RESET DO PIN","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"PIN","channel":"Web","client":"Apex Pay","createdTime":"2026-05-05","closedTime":"2026-05-05","resolutionHours":3.7},{"id":"6616","subject":"Acesso bloqueado","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Acesso bloqueado","channel":"Web","client":"Health Cash","createdTime":"2026-05-04","closedTime":"2026-05-05","resolutionHours":27.0},{"id":"6613","subject":"INSTABILIDADE BACKOFFICE","status":"Fechado","priority":"Alta","category":"Backoffice","subCategory":"Sem Acesso Backoffice","channel":"Web","client":"Apex Pay","createdTime":"2026-05-04","closedTime":"2026-05-05","resolutionHours":31.4},{"id":"6624","subject":"SOBERANA 10 LTDA-senha 4 digitos","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"PIN","channel":"Web","client":"NityBank","createdTime":"2026-05-05","closedTime":"2026-05-05","resolutionHours":2.7},{"id":"6627","subject":"Erro: Permissão Não Concedida para realizar a operação","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Health Cash","createdTime":"2026-05-05","closedTime":"2026-05-06","resolutionHours":24.0},{"id":"6323","subject":"Cartão virtual não funciona nem débito e crédito","status":"Fechado","priority":"Média","category":"Cartão Virtual","subCategory":"Cartão Virtual Não Funciona","channel":"Web","client":"Vellox Bank","createdTime":"2026-03-23","closedTime":"2026-05-06","resolutionHours":1061.9},{"id":"6568","subject":"TRANSAÇÕES REPROVADAS -Edmilson Cezar da Silva","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Apex Pay","createdTime":"2026-04-27","closedTime":"2026-05-06","resolutionHours":221.7},{"id":"6581","subject":"Problema no Limite das contas","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Fluxa Pay","createdTime":"2026-04-27","closedTime":"2026-05-06","resolutionHours":217.8},{"id":"6617","subject":"Limite","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Isocord Bank","createdTime":"2026-05-04","closedTime":"2026-05-06","resolutionHours":49.1},{"id":"6576","subject":"Utilização da Plataforma","status":"Fechado","priority":"Alta","category":"CCB","subCategory":"Contratos","channel":"Web","client":"Sisadm","createdTime":"2026-04-27","closedTime":"2026-05-06","resolutionHours":219.2},{"id":"6597","subject":"Reprovação de transferência","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"Fluxa Pay","createdTime":"2026-04-29","closedTime":"2026-05-06","resolutionHours":170.4},{"id":"6602","subject":"Erro ao transferir","status":"Fechado","priority":"Média","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"6P Bank","createdTime":"2026-04-30","closedTime":"2026-05-06","resolutionHours":143.2},{"id":"6606","subject":"AUMENTO DE LIMITE - MAIRA DANUSE SANTOS DE OLIVEIRA","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Meirelles Bank","createdTime":"2026-04-30","closedTime":"2026-05-06","resolutionHours":141.8},{"id":"6621","subject":"Erro ao efetuar pagamento de boletos","status":"Fechado","priority":"Média","category":"Pagamento de Boletos","subCategory":"Dúvidas/Outros","channel":"Web","client":"Won Bank","createdTime":"2026-05-04","closedTime":"2026-05-06","resolutionHours":47.4},{"id":"6490","subject":"ABRIR CONTA PJ -Ponto fitness","status":"Fechado","priority":"Média","category":"Abertura de conta PJ","subCategory":"Abertura de Conta PJ por Formulário","channel":"Web","client":"Apex Pay","createdTime":"2026-04-15","closedTime":"2026-05-06","resolutionHours":509.5},{"id":"6620","subject":"Pedro Victor alves Melo Gonzalez -pix reprov","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"NityBank","createdTime":"2026-05-04","closedTime":"2026-05-06","resolutionHours":47.5},{"id":"6503","subject":"17.839.169/0001-32 Qualymais Supermercados - erro na tela para abertura da conta","status":"Fechado","priority":"Média","category":"Abertura de conta PJ","subCategory":"Abertura de Conta PJ por Formulário","channel":"Web","client":"BPO","createdTime":"2026-04-16","closedTime":"2026-05-06","resolutionHours":486.9},{"id":"6635","subject":"Senha de acesso","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Denardo","createdTime":"2026-05-06","closedTime":"2026-05-07","resolutionHours":21.5},{"id":"6637","subject":"Cadastro de cliente - conta bancária","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Denardo","createdTime":"2026-05-06","closedTime":"2026-05-07","resolutionHours":18.4},{"id":"6145","subject":"Falhas em Integrações de Pagamento – QR Code e Retorno de Boleto","status":"Fechado","priority":"Sem prioridade","category":"API","subCategory":"Suporte API","channel":"Web","client":"Resolve Bank","createdTime":"2026-02-26","closedTime":"2026-05-07","resolutionHours":1675.0},{"id":"6619","subject":"Problema na leitura de QR Code pelo Nubank","status":"Fechado","priority":"Média","category":"PIX QrCode","subCategory":"Erro ao pagar por Pix QrCode","channel":"Web","client":"Lothus","createdTime":"2026-05-04","closedTime":"2026-05-07","resolutionHours":71.0},{"id":"6058","subject":"opcao de retorno para a tela anterior nao funciona no IOS - Open Finance","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Dúvidas/Outros","channel":"Web","client":"4shark","createdTime":"2026-02-10","closedTime":"2026-05-07","resolutionHours":2067.5},{"id":"6596","subject":"Ajustar nome social","status":"Fechado","priority":"Média","category":"Backoffice","subCategory":"Alteração de dados de contato","channel":"Web","client":"Rhiza","createdTime":"2026-04-29","closedTime":"2026-05-07","resolutionHours":196.1},{"id":"6614","subject":"Auemtno de limite da conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Health Cash","createdTime":"2026-05-04","closedTime":"2026-05-07","resolutionHours":76.9},{"id":"6638","subject":"Erro ao acessar detalhes das contas","status":"Fechado","priority":"Alta","category":"Backoffice","subCategory":"Detalhes das contas não carregam","channel":"Web","client":"Uze","createdTime":"2026-05-07","closedTime":"2026-05-07","resolutionHours":2.9},{"id":"6629","subject":"dalva verzone onório- encerramento de conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Conta encerrada","channel":"Web","client":"NityBank","createdTime":"2026-05-05","closedTime":"2026-05-07","resolutionHours":47.6},{"id":"6611","subject":"CONTAS ESTÃO COM INSTABILIDADE","status":"Fechado","priority":"Média","category":"Backoffice","subCategory":"Detalhes das contas não carregam","channel":"Web","client":"Apex Pay","createdTime":"2026-05-02","closedTime":"2026-05-07","resolutionHours":126.2},{"id":"6506","subject":"Solicitação de Abertura de Conta PJ por Formulário","status":"Fechado","priority":"Média","category":"Abertura de conta PJ","subCategory":"Abertura de Conta PJ por Formulário","channel":"Web","client":"Lothus","createdTime":"2026-04-16","closedTime":"2026-05-08","resolutionHours":525.6},{"id":"6595","subject":"NAO TEM OPÇÃO PARA ANEXAR DOCUMENTO FRENTE E VERSO - ANA CLAUDIA CARDOSO EUGENIO","status":"Fechado","priority":"Média","category":"Abertura de Conta PF","subCategory":"Upload de documentos","channel":"Web","client":"Meirelles Bank","createdTime":"2026-04-28","closedTime":"2026-05-11","resolutionHours":304.0},{"id":"6649","subject":"Erro: Permissão Não Concedida para realizar a operação","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Health Cash","createdTime":"2026-05-08","closedTime":"2026-05-11","resolutionHours":73.3},{"id":"6631","subject":"Camila Mendes de Oliveira-","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Acesso bloqueado","channel":"Web","client":"NityBank","createdTime":"2026-05-06","closedTime":"2026-05-12","resolutionHours":143.1},{"id":"6600","subject":"Aumento de limite","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Isocord Bank","createdTime":"2026-04-30","closedTime":"2026-05-12","resolutionHours":286.1},{"id":"6634","subject":"Editar dados - Minha Conta","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Denardo","createdTime":"2026-05-06","closedTime":"2026-05-12","resolutionHours":142.8},{"id":"6662","subject":"Atualização para habilitar o WebView em produção com a identidade visual","status":"Fechado","priority":"Sem prioridade","category":"API","subCategory":"Suporte API","channel":"Web","client":"Brotas System","createdTime":"2026-05-12","closedTime":"2026-05-12","resolutionHours":0.0},{"id":"6645","subject":"Extrato não exporta em PDF","status":"Fechado","priority":"Média","category":"Extrato","subCategory":"Extrato não gera","channel":"Web","client":"Resolve Bank","createdTime":"2026-05-08","closedTime":"2026-05-12","resolutionHours":103.2},{"id":"6654","subject":"Consulta de Limite","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Health Cash","createdTime":"2026-05-11","closedTime":"2026-05-13","resolutionHours":48.5},{"id":"6633","subject":"Cadastro de colaborador","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Denardo","createdTime":"2026-05-06","closedTime":"2026-05-13","resolutionHours":166.0},{"id":"6632","subject":"Assinatura do contrato via e-mail","status":"Fechado","priority":"Sem prioridade","category":"CCB","subCategory":"Assinatura","channel":"Web","client":"Denardo","createdTime":"2026-05-06","closedTime":"2026-05-13","resolutionHours":167.0},{"id":"6603","subject":"TRANZAÇÕES REPROVADA- Jaine Felix da Silva Clemente","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Apex Pay","createdTime":"2026-04-30","closedTime":"2026-05-13","resolutionHours":309.5},{"id":"6623","subject":"TRANSAÇÕES REPROVDAS- Linos Engenharia","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transações Reprovadas","channel":"Web","client":"Apex Pay","createdTime":"2026-05-04","closedTime":"2026-05-13","resolutionHours":210.8},{"id":"6450","subject":"CARTÃO BLOQUEADO","status":"Fechado","priority":"Alta","category":"Cartão","subCategory":"Cartão bloqueado","channel":"Web","client":"Imobi","createdTime":"2026-04-09","closedTime":"2026-05-13","resolutionHours":815.3},{"id":"6657","subject":"Conta bloqueada","status":"Fechado","priority":"Média","category":"Backoffice","subCategory":"Conta Bloqueada","channel":"Web","client":"Ultrabank","createdTime":"2026-05-12","closedTime":"2026-05-14","resolutionHours":47.4},{"id":"6643","subject":"Erro: Permissão Não Concedida para realizar a operação","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Health Cash","createdTime":"2026-05-08","closedTime":"2026-05-14","resolutionHours":145.0},{"id":"6665","subject":"Erro: Permissão Não Concedida para realizar a operação","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Health Cash","createdTime":"2026-05-13","closedTime":"2026-05-14","resolutionHours":23.7},{"id":"6605","subject":"EXTRATO ALTERADO -Graziela Estefany de arruda","status":"Fechado","priority":"Média","category":"Extrato","subCategory":"Divergência no extrato","channel":"Web","client":"Apex Pay","createdTime":"2026-04-30","closedTime":"2026-05-14","resolutionHours":335.0},{"id":"6664","subject":"DIVERGÊNCIA NO EXTRATO","status":"Fechado","priority":"Média","category":"Extrato","subCategory":"Divergência no extrato","channel":"Web","client":"Resolve Bank","createdTime":"2026-05-12","closedTime":"2026-05-15","resolutionHours":61.9},{"id":"6227","subject":"FALHAS NAS EMISSÕES DE BOLETOS - PESSOA JURIDICA","status":"Fechado","priority":"Alta","category":"Boleto","subCategory":"Erro na Emissão do Boleto","channel":"Web","client":"SectoPay","createdTime":"2026-03-10","closedTime":"2026-05-15","resolutionHours":1577.8},{"id":"6585","subject":"TRANSAÇÕES REPROVADAS - Patrícia Goulart assolari","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"Apex Pay","createdTime":"2026-04-28","closedTime":"2026-05-15","resolutionHours":406.7},{"id":"6572","subject":"LOGO MARCA NOS EMAILS","status":"Fechado","priority":"Média","category":"Identidade Visual","subCategory":"Alteração na Identidade Visual na solução","channel":"Web","client":"Apex Pay","createdTime":"2026-04-27","closedTime":"2026-05-15","resolutionHours":428.9},{"id":"6628","subject":"TRANSAÇÕES REPROVADAS -Yuri dos Santos Costa","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transações Reprovadas","channel":"Web","client":"Apex Pay","createdTime":"2026-05-05","closedTime":"2026-05-15","resolutionHours":231.9},{"id":"6644","subject":"Dispositivo nao vinculou à conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Acesso por dispositivo","channel":"Web","client":"Axiis","createdTime":"2026-05-08","closedTime":"2026-05-15","resolutionHours":166.2},{"id":"6607","subject":"PLANOS","status":"Fechado","priority":"Média","category":"Backoffice","subCategory":"Mudança de Plano","channel":"Web","client":"Apex Pay","createdTime":"2026-04-30","closedTime":"2026-05-15","resolutionHours":350.5},{"id":"6615","subject":"Cliente tenta realizar PIX mas estorna a operação","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transação Estornando","channel":"Web","client":"Rapidium","createdTime":"2026-05-04","closedTime":"2026-05-15","resolutionHours":260.8},{"id":"6609","subject":"TARIFA PONTUAL REPROVADA- SAMIA SUELEN CRUZ CORREA","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transações Reprovadas","channel":"Web","client":"Apex Pay","createdTime":"2026-04-30","closedTime":"2026-05-15","resolutionHours":349.2},{"id":"6648","subject":"Erica Cristina Nunes Rabelo- pix reprovados","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"NityBank","createdTime":"2026-05-08","closedTime":"2026-05-15","resolutionHours":162.4},{"id":"6658","subject":"Aumento de Limite da Conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Aumento de Limite da Conta","channel":"Web","client":"Health Cash","createdTime":"2026-05-12","closedTime":"2026-05-15","resolutionHours":76.9},{"id":"6678","subject":"Automação pode fechar o ticket","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Alteração de dados de contato","channel":"Web","client":"Fluxa Pay","createdTime":"2026-05-15","closedTime":"2026-05-15","resolutionHours":2.0},{"id":"6674","subject":"Estorno de valor","status":"Fechado","priority":"Média","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"Solix Bank","createdTime":"2026-05-14","closedTime":"2026-05-18","resolutionHours":86.3},{"id":"6686","subject":"Sem acesso de todos","status":"Fechado","priority":"Sem prioridade","category":"CCB","subCategory":"Usuários","channel":"Web","client":"Sisadm","createdTime":"2026-05-18","closedTime":"2026-05-18","resolutionHours":5.0},{"id":"6667","subject":"Validação de selfie","status":"Fechado","priority":"Sem prioridade","category":"Dúvidas/Outros","subCategory":"Configurações","channel":"Web","client":"Denardo","createdTime":"2026-05-13","closedTime":"2026-05-18","resolutionHours":119.4},{"id":"6673","subject":"Usurário não consegue realizar transações","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Vellox Bank","createdTime":"2026-05-14","closedTime":"2026-05-18","resolutionHours":98.2},{"id":"6695","subject":"Usuário está com conta bloqueada","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Acesso bloqueado","channel":"Web","client":"Fluxa Pay","createdTime":"2026-05-18","closedTime":"2026-05-18","resolutionHours":0.2},{"id":"6668","subject":"pix reprovado","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"TT DIGITAL","createdTime":"2026-05-13","closedTime":"2026-05-19","resolutionHours":135.7},{"id":"6593","subject":"Cobrança de plano duplicada","status":"Fechado","priority":"Alta","category":"Backoffice","subCategory":"Cobrança de Planos","channel":"Web","client":"Uze","createdTime":"2026-04-28","closedTime":"2026-05-19","resolutionHours":497.8},{"id":"6604","subject":"SALDO SUMIU DA CONTA- Ana Vitória Alves de souza","status":"Fechado","priority":"Alta","category":"Extrato","subCategory":"Divergência no extrato","channel":"Web","client":"Apex Pay","createdTime":"2026-04-30","closedTime":"2026-05-19","resolutionHours":455.5},{"id":"6601","subject":"Solicitação de ampliação do limite diário de emissão de boletos","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Ultrabank","createdTime":"2026-04-30","closedTime":"2026-05-20","resolutionHours":472.8},{"id":"6700","subject":"Nity- erro no pagamento com pix","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"NityBank","createdTime":"2026-05-19","closedTime":"2026-05-19","resolutionHours":5.7},{"id":"6622","subject":"Cobrado sequencia da taxa de manutenção.","status":"Fechado","priority":"Sem prioridade","category":"Planos","subCategory":"Duplicidade na cobrança de planos","channel":"Web","client":"Vellox Bank","createdTime":"2026-05-04","closedTime":"2026-05-20","resolutionHours":378.0},{"id":"6685","subject":"Carlos Henrique Cardoso Goulart junior- limite pix noturno","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Sem limite","channel":"Web","client":"NityBank","createdTime":"2026-05-15","closedTime":"2026-05-20","resolutionHours":114.9},{"id":"6687","subject":"Alteração da logo no APP e backoffice","status":"Fechado","priority":"Média","category":"Aplicativo","subCategory":"Alteração da descrição do aplicativo","channel":"Web","client":"Axiis","createdTime":"2026-05-18","closedTime":"2026-05-20","resolutionHours":50.3},{"id":"6553","subject":"ALTERAÇÃO CONTRATUAL -Escala Investimento","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Alteração dados pessoais","channel":"Web","client":"Apex Pay","createdTime":"2026-04-23","closedTime":"2026-05-20","resolutionHours":649.6},{"id":"6630","subject":"TRANSAÇÕES REPROVADAS- Nayara Fernandes Machado Silva","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transações Reprovadas","channel":"Web","client":"Apex Pay","createdTime":"2026-05-05","closedTime":"2026-05-20","resolutionHours":354.2},{"id":"6646","subject":"Erro no pix","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"Rhiza","createdTime":"2026-05-08","closedTime":"2026-05-20","resolutionHours":291.4},{"id":"6653","subject":"PIX - REPROVADO","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transações Reprovadas","channel":"Web","client":"K2 Capital","createdTime":"2026-05-08","closedTime":"2026-05-20","resolutionHours":283.8},{"id":"6655","subject":"Pix","status":"Fechado","priority":"Média","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"6P Bank","createdTime":"2026-05-11","closedTime":"2026-05-20","resolutionHours":218.6},{"id":"6523","subject":"Alterar Agencia de uma conta","status":"Fechado","priority":"Média","category":"Backoffice","subCategory":"Cobrança de Planos","channel":"Web","client":"4shark","createdTime":"2026-04-20","closedTime":"2026-05-20","resolutionHours":724.0},{"id":"6640","subject":"COBRANÇAS DE TARIFAS PONTUAIS","status":"Fechado","priority":"Alta","category":"Backoffice","subCategory":"Cobrança de tarifas","channel":"Web","client":"Apex Pay","createdTime":"2026-05-07","closedTime":"2026-05-20","resolutionHours":308.7},{"id":"6652","subject":"PIX NAO LIQUIDADO NA CONTA: APEX PAY LTDA","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Identificação PIX","channel":"Web","client":"Apex Pay","createdTime":"2026-05-08","closedTime":"2026-05-20","resolutionHours":284.3},{"id":"6672","subject":"Como funciona as taxas de IOF e CET na hora de enviar para criação da CCB","status":"Fechado","priority":"Média","category":"CCB","subCategory":"Dúvidas/Outros","channel":"Web","client":"CrediGrupo","createdTime":"2026-05-14","closedTime":"2026-05-20","resolutionHours":143.8},{"id":"6680","subject":"editar proposta","status":"Fechado","priority":"Média","category":"CCB","subCategory":"Contratos","channel":"Web","client":"MultiCred","createdTime":"2026-05-15","closedTime":"2026-05-20","resolutionHours":121.9},{"id":"6661","subject":"Lais Gonçalves da Silva Batalha- analise de conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Análise da conta","channel":"Web","client":"NityBank","createdTime":"2026-05-12","closedTime":"2026-05-20","resolutionHours":194.4},{"id":"6690","subject":"Encerramento de Company Fluxa","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Conta encerrada","channel":"Web","client":"Fluxa Pay","createdTime":"2026-05-18","closedTime":"2026-05-20","resolutionHours":49.5},{"id":"6705","subject":"Alteração nome do cliente","status":"Fechado","priority":"Sem prioridade","category":"Dúvidas/Outros","subCategory":"Edição de dados","channel":"Web","client":"Denardo","createdTime":"2026-05-19","closedTime":"2026-05-20","resolutionHours":23.6},{"id":"6626","subject":"abertura de conta","status":"Fechado","priority":"Média","category":"Abertura de conta PF e PJ","subCategory":"Orientações de como abrir conta","channel":"Web","client":"TT DIGITAL","createdTime":"2026-05-05","closedTime":"2026-05-20","resolutionHours":363.6},{"id":"6715","subject":"Rodrigo Carvalho Lima- pix e teds reprovados","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Dúvidas sobre reprovações","channel":"Web","client":"NityBank","createdTime":"2026-05-20","closedTime":"2026-05-20","resolutionHours":2.4},{"id":"6723","subject":"Alteração de Nome","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Alteração dados pessoais","channel":"Web","client":"ClickDin","createdTime":"2026-05-21","closedTime":"2026-05-21","resolutionHours":0.5},{"id":"6725","subject":"Alteração de Número Celular","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Alteração dados pessoais","channel":"Web","client":"Tryplo Pay","createdTime":"2026-05-21","closedTime":"2026-05-22","resolutionHours":15.0},{"id":"6711","subject":"Camila elen muniz- analise de conta","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Análise da conta","channel":"Web","client":"NityBank","createdTime":"2026-05-20","closedTime":"2026-05-22","resolutionHours":45.4},{"id":"6721","subject":"Arthur Rodrigues Barros -analise de conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Análise da conta","channel":"Web","client":"NityBank","createdTime":"2026-05-21","closedTime":"2026-05-22","resolutionHours":19.7},{"id":"6709","subject":"Ana Flavia Saraiva Ferreira- analise de conta","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Análise da conta","channel":"Web","client":"NityBank","createdTime":"2026-05-20","closedTime":"2026-05-22","resolutionHours":48.6},{"id":"6610","subject":"ERRO NO ENVIO  DA CCB","status":"Fechado","priority":"Alta","category":"CCB","subCategory":"Solicitação de Investimento","channel":"Web","client":"Apex Pay","createdTime":"2026-04-30","closedTime":"2026-05-22","resolutionHours":519.6},{"id":"6636","subject":"ABERTURA DE CONTA  PJ - TONIAZZO GROUP","status":"Fechado","priority":"Média","category":"Abertura de conta PJ","subCategory":"Abertura de Conta PJ por Formulário","channel":"Web","client":"Apex Pay","createdTime":"2026-05-06","closedTime":"2026-05-22","resolutionHours":383.7},{"id":"6728","subject":"Laine karen Macedo da Silva- conta encerrada com saldo","status":"Fechado","priority":"Média","category":"Conta","subCategory":"Conta encerrada","channel":"Web","client":"NityBank","createdTime":"2026-05-22","closedTime":"2026-05-22","resolutionHours":0.3},{"id":"6694","subject":"Nitybank-agencia digital","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"NityBank","createdTime":"2026-05-18","closedTime":"2026-05-25","resolutionHours":161.9},{"id":"6731","subject":"Nity Bank- mensagem de boa vindas e reprovacao","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Acesso bloqueado","channel":"Web","client":"NityBank","createdTime":"2026-05-25","closedTime":"2026-05-25","resolutionHours":2.1},{"id":"6710","subject":"Cancelar conta - Ana Flavia Saraiva Ferreira","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"NityBank","createdTime":"2026-05-20","closedTime":"2026-05-25","resolutionHours":125.4},{"id":"6726","subject":"pix estornando continuamente","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"TT DIGITAL","createdTime":"2026-05-21","closedTime":"2026-05-26","resolutionHours":113.9},{"id":"6706","subject":"Atualização junto ao banco liquidante","status":"Fechado","priority":"Sem prioridade","category":"Pagamento de Boletos","subCategory":"Sem limite","channel":"Web","client":"Ultrabank","createdTime":"2026-05-19","closedTime":"2026-05-21","resolutionHours":45.7},{"id":"6669","subject":"Urgência na regularização do envio de código de redefinição de senha","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Alteração de dados de contato","channel":"Web","client":"Ultrabank","createdTime":"2026-05-14","closedTime":"2026-05-21","resolutionHours":174.0},{"id":"6729","subject":"Erro: Permissão Não Concedida para realizar a operação","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Health Cash","createdTime":"2026-05-22","closedTime":"2026-05-26","resolutionHours":96.4},{"id":"6724","subject":"Nity- abertura de contas","status":"Fechado","priority":"Alta","category":"Abertura de conta PF e PJ","subCategory":"Selfie não abre","channel":"Web","client":"NityBank","createdTime":"2026-05-21","closedTime":"2026-05-22","resolutionHours":22.9},{"id":"6692","subject":"PIX QR CODE INDISPONIVEL","status":"Fechado","priority":"Alta","category":"PIX QrCode","subCategory":"Erro ao pagar por Pix QrCode","channel":"Web","client":"Apex Pay","createdTime":"2026-05-18","closedTime":"2026-05-22","resolutionHours":94.0},{"id":"6656","subject":"PLANO","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Cobrança de Planos","channel":"Web","client":"Snob","createdTime":"2026-05-11","closedTime":"2026-05-25","resolutionHours":340.4},{"id":"6684","subject":"Não foi possível compartilhar o comprovante","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Dúvidas/Outros","channel":"Web","client":"Health Cash","createdTime":"2026-05-15","closedTime":"2026-05-27","resolutionHours":285.8},{"id":"6671","subject":"Leonardo Rodrigues de Novaes- comprovante pix","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Dúvidas/Outros","channel":"Web","client":"NityBank","createdTime":"2026-05-14","closedTime":"2026-05-27","resolutionHours":312.2},{"id":"6698","subject":"SOCIO PJ","status":"Fechado","priority":"Média","category":"Abertura de conta PJ","subCategory":"Orientações de como abrir conta","channel":"Web","client":"TT DIGITAL","createdTime":"2026-05-19","closedTime":"2026-05-22","resolutionHours":75.1},{"id":"6717","subject":"Laine karen Macedo da Silva- pix reprovados","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Dúvidas sobre reprovações","channel":"Web","client":"NityBank","createdTime":"2026-05-21","closedTime":"2026-05-27","resolutionHours":142.9},{"id":"6693","subject":"CLIENTE ID","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Ultrabank","createdTime":"2026-05-18","closedTime":"2026-05-25","resolutionHours":169.6},{"id":"6696","subject":"Solicitação de orientação – Bloqueio por política interna","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Conta Bloqueada","channel":"Web","client":"Ultrabank","createdTime":"2026-05-19","closedTime":"2026-05-27","resolutionHours":192.7},{"id":"6688","subject":"Erro pix copia e cola","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Alteração de dados de contato","channel":"Web","client":"6P Bank","createdTime":"2026-05-18","closedTime":"2026-05-25","resolutionHours":172.7},{"id":"6707","subject":"Marcelo Calil Petrus - Informe rendimentos 2025/2026","status":"Fechado","priority":"Sem prioridade","category":"Extrato","subCategory":"Solicitação de Extrato da conta","channel":"Web","client":"NityBank","createdTime":"2026-05-19","closedTime":"2026-05-25","resolutionHours":142.9},{"id":"6712","subject":"Patrick Albonico- pix reprovados","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Falha na Transação de PIX","channel":"Web","client":"NityBank","createdTime":"2026-05-20","closedTime":"2026-05-26","resolutionHours":142.6},{"id":"6703","subject":"Criação de Acesso ao Financeiro - Conta Digital","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Senha de Acesso","channel":"Web","client":"Uze","createdTime":"2026-05-19","closedTime":"2026-05-25","resolutionHours":146.4},{"id":"6719","subject":"COBRANÇA DE PLANO","status":"Fechado","priority":"Sem prioridade","category":"Planos","subCategory":"Cobrança de Planos","channel":"Web","client":"Snob","createdTime":"2026-05-21","closedTime":"2026-05-27","resolutionHours":140.5},{"id":"6754","subject":"RE: Hiperbanco Incident - Instabilidade PIX CASH OUT","status":"Fechado","priority":"Sem prioridade","category":"Não categorizado","subCategory":"Não categorizado","channel":"Email","client":"NityBank","createdTime":"2026-05-27","closedTime":"2026-05-27","resolutionHours":0.1},{"id":"6752","subject":"Erro ao acessar a conta","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Conta Bloqueada","channel":"Web","client":"Vellox Bank","createdTime":"2026-05-27","closedTime":"2026-05-28","resolutionHours":22.0},{"id":"6659","subject":"Inconsistência na leitura de QR Code","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Configurações","channel":"Web","client":"Ultrabank","createdTime":"2026-05-12","closedTime":"2026-05-28","resolutionHours":388.7},{"id":"6727","subject":"CONTA REPROVADA - Luis Eduardo Lopes","status":"Fechado","priority":"Alta","category":"Abertura de conta PJ","subCategory":"Conta Recusada","channel":"Web","client":"Apex Pay","createdTime":"2026-05-22","closedTime":"2026-05-28","resolutionHours":146.3},{"id":"6737","subject":"RSP PRODUCOES LTDA- alteracao de endereço","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Alteração dados pessoais","channel":"Web","client":"NityBank","createdTime":"2026-05-25","closedTime":"2026-05-28","resolutionHours":71.0},{"id":"6718","subject":"CHEQUE","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"Análise da conta","channel":"Web","client":"Snob","createdTime":"2026-05-21","closedTime":"2026-05-28","resolutionHours":168.5},{"id":"6751","subject":"Nome e dados errados","status":"Fechado","priority":"Sem prioridade","category":"CCB","subCategory":"Edição de dados","channel":"Web","client":"Sisadm","createdTime":"2026-05-27","closedTime":"2026-05-28","resolutionHours":27.7},{"id":"6758","subject":"PIN DE OPERAÇÕES","status":"Fechado","priority":"Alta","category":"Conta","subCategory":"PIN","channel":"Web","client":"TT DIGITAL","createdTime":"2026-05-27","closedTime":"2026-05-28","resolutionHours":24.2},{"id":"6642","subject":"O CLIENTE NÃO ESTÁ CONSEGUINDO FAZER PIX","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Erro: Permissão Não Concedida para realizar a operação","channel":"Web","client":"Snob","createdTime":"2026-05-07","closedTime":"2026-05-15","resolutionHours":181.9},{"id":"6766","subject":"vinicius de Freitas Teixeira - qr code impresso","status":"Fechado","priority":"Média","category":"PIX QrCode","subCategory":"Dúvidas/Outros","channel":"Web","client":"NityBank","createdTime":"2026-05-28","closedTime":"2026-05-29","resolutionHours":16.6},{"id":"6670","subject":"Inconsistência no código de verificação — urgência na correção","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Alteração de dados de contato","channel":"Web","client":"Ultrabank","createdTime":"2026-05-14","closedTime":"2026-05-29","resolutionHours":361.1},{"id":"6730","subject":"Não conseguimos realizar transações","status":"Fechado","priority":"Alta","category":"Aplicativo","subCategory":"Aplicativo fora do ar","channel":"Web","client":"Simpbank","createdTime":"2026-05-23","closedTime":"2026-05-29","resolutionHours":136.7},{"id":"6753","subject":"Patrick Albonico- pix reprovados 2","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Dúvidas sobre reprovações","channel":"Web","client":"NityBank","createdTime":"2026-05-27","closedTime":"2026-05-29","resolutionHours":44.5},{"id":"6761","subject":"Camila Lessa Alves- pix reprovados","status":"Fechado","priority":"Alta","category":"PIX","subCategory":"Transações Reprovadas","channel":"Web","client":"NityBank","createdTime":"2026-05-28","closedTime":"2026-05-29","resolutionHours":22.0},{"id":"6702","subject":"Dúvidas técnicas sobre operação PIX SPLIT e fluxo automatizado","status":"Fechado","priority":"Sem prioridade","category":"API","subCategory":"Suporte API","channel":"Web","client":"Resolve Bank","createdTime":"2026-05-19","closedTime":"2026-05-29","resolutionHours":236.7},{"id":"6558","subject":"Limite Pix","status":"Fechado","priority":"Sem prioridade","category":"Backoffice","subCategory":"Alteração de dados de contato","channel":"Web","client":"6P Bank","createdTime":"2026-04-24","closedTime":"2026-05-29","resolutionHours":839.5}];
+
+// ── color maps ──
+const CAT_COLORS = {
+  'PIX':'#00d4ff','Conta':'#00e5a0','Backoffice':'#ffb800','CCB':'#9b6dff',
+  'Abertura de conta PJ':'#ff8c42','Extrato':'#ff6b9d','Aplicativo':'#4ecdc4',
+  'API':'#a8e6cf','PIX QrCode':'#ffd93d','Pagamento de Boletos':'#6bcb77',
+  'Dúvidas/Outros':'#845ec2','Planos':'#f9c74f','Abertura de conta PF e PJ':'#f8961e',
+  'Cartão Virtual':'#e63946','Cartão':'#c77dff','Boleto':'#48cae4',
+  'Abertura de Conta PF':'#b5e48c','Identidade Visual':'#ff99c8','P2P':'#caffbf',
+  'Não categorizado':'#4a5568'
+};
+const PRIO_COLORS = {'Alta':'#ff4757','Média':'#ffb800','Sem prioridade':'#4a5568'};
+
+const gc = isDark => isDark ? '#2d3748' : '#e2e8f0';
+const tc = '#718096';
+
+Chart.defaults.color = tc;
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.font.size = 11;
+
+// ── state ──
+let activeFilter = 'all', searchTerm = '', chartInstances = {};
+
+function getFiltered() {
+  return DATA.filter(t => {
+    const mf = activeFilter === 'all' || t.priority === activeFilter;
+    const q = searchTerm.toLowerCase();
+    const ms = !q || t.subject.toLowerCase().includes(q) || t.client.toLowerCase().includes(q) || t.id.includes(q);
+    return mf && ms;
+  });
+}
+
+function setFilter(v, btn) {
+  activeFilter = v;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTicketsPage();
+}
+function filterSearch(v) { searchTerm = v; renderTicketsPage(); }
+
+function agg(data, key) {
+  const m = {};
+  data.forEach(t => { const k = t[key] || '?'; m[k] = (m[k]||0)+1; });
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+}
+
+function mkChart(id, config) {
+  if(chartInstances[id]) chartInstances[id].destroy();
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  chartInstances[id] = new Chart(ctx, config);
+  return chartInstances[id];
+}
+
+// ── OVERVIEW ──
+function renderOverview() {
+  const d = DATA;
+  const times = d.map(t=>t.resolutionHours).filter(h=>h!=null);
+  const avg = times.reduce((a,b)=>a+b,0)/times.length;
+  const mn = Math.min(...times); const mx = Math.max(...times);
+  const clients = new Set(d.map(t=>t.client)).size;
+
+  document.getElementById('kpi-total').textContent = d.length;
+  document.getElementById('kpi-avg').textContent = Math.round(avg)+'h';
+  document.getElementById('kpi-min').textContent = mn.toFixed(1)+'h';
+  document.getElementById('kpi-max').textContent = Math.round(mx)+'h';
+  document.getElementById('kpi-clients').textContent = clients;
+
+  // Daily
+  const days={};
+  for(let i=1;i<=29;i++) days['2026-05-'+String(i).padStart(2,'0')]=0;
+  d.forEach(t=>{if(days[t.closedTime]!==undefined)days[t.closedTime]++});
+  const active = Object.entries(days).filter(([,v])=>v>0);
+  const dlabels = active.map(([k])=>parseInt(k.slice(-2))+'/05');
+  const dvals = active.map(([,v])=>v);
+  const peakIdx = dvals.indexOf(Math.max(...dvals));
+  document.getElementById('peak-day').textContent = 'Pico: '+dlabels[peakIdx]+' ('+dvals[peakIdx]+' tickets)';
+  document.getElementById('daily-total-tag').textContent = d.length+' tickets';
+
+  mkChart('cDaily',{
+    type:'bar',
+    data:{labels:dlabels,datasets:[{
+      data:dvals,
+      backgroundColor:dvals.map((v,i)=>i===peakIdx?'#ff4757':v>=10?'#ffb800':'rgba(0,212,255,0.7)'),
+      borderRadius:5,borderSkipped:false
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        title:c=>'Fechados em '+c[0].label,
+        label:c=>' '+c.raw+' ticket'+(c.raw!==1?'s':'')
+      }}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:10},maxRotation:45},grid:{display:false}},
+        y:{ticks:{color:tc,font:{size:10},stepSize:2},grid:{color:'rgba(255,255,255,0.05)'},
+          title:{display:true,text:'Tickets',color:tc,font:{size:9}}}
+      }
+    }
+  });
+
+  // Prio doughnut
+  const prioAgg = agg(d,'priority');
+  const pLabels=prioAgg.map(a=>a[0]),pVals=prioAgg.map(a=>a[1]);
+  const pColors=pLabels.map(l=>PRIO_COLORS[l]||'#4a5568');
+  const total=pVals.reduce((a,b)=>a+b,0);
+  document.getElementById('prio-legend').innerHTML=pLabels.map((l,i)=>
+    `<div class="legend-item"><div class="ldot" style="background:${pColors[i]}"></div>${l} — ${pVals[i]} <span style="color:var(--muted)">(${Math.round(pVals[i]/total*100)}%)</span></div>`
+  ).join('');
+  mkChart('cPrio',{type:'doughnut',
+    data:{labels:pLabels,datasets:[{data:pVals,backgroundColor:pColors,borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} (${Math.round(c.raw/total*100)}%)`}}}
+    }
+  });
+
+  // Category bar
+  const catAgg = agg(d,'category').slice(0,10);
+  document.getElementById('cat-top').textContent = catAgg[0][0]+' ('+catAgg[0][1]+')';
+  mkChart('cCat',{type:'bar',
+    data:{labels:catAgg.map(a=>a[0]),datasets:[{data:catAgg.map(a=>a[1]),
+      backgroundColor:catAgg.map(a=>CAT_COLORS[a[0]]||'#4a5568'),borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+' tickets'}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:9},maxRotation:30},grid:{display:false}},
+        y:{ticks:{color:tc,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+
+  // Resolution buckets
+  const bkt=[
+    {l:'Mesmo dia\n(< 24h)',max:24,c:'#00e5a0',n:0},
+    {l:'1 – 3 dias',max:72,c:'#00d4ff',n:0},
+    {l:'3 – 7 dias',max:168,c:'#ffb800',n:0},
+    {l:'7 – 14 dias',max:336,c:'#ff8c42',n:0},
+    {l:'Mais de 14 dias',max:Infinity,c:'#ff4757',n:0}
+  ];
+  d.forEach(t=>{const h=t.resolutionHours||0;for(const b of bkt){if(h<b.max){b.n++;break;}}});
+  mkChart('cRes',{type:'bar',
+    data:{labels:bkt.map(b=>b.l),datasets:[{data:bkt.map(b=>b.n),
+      backgroundColor:bkt.map(b=>b.c),borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:c=>` ${c.raw} tickets (${Math.round(c.raw/d.length*100)}%)`
+      }}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:tc,font:{size:10},stepSize:5},grid:{color:'rgba(255,255,255,0.05)'},
+          title:{display:true,text:'Qtd. tickets',color:tc,font:{size:9}}}
+      }
+    }
+  });
+
+  // Client ranking cards
+  const clAgg = agg(d,'client');
+  const grandTotal = d.length;
+  const rankIcons = ['🥇','🥈','🥉'];
+  const rankColors = ['#ffb800','#718096','#ff8c42'];
+  const clRes = {};
+  d.forEach(t=>{ if(!clRes[t.client])clRes[t.client]=[]; clRes[t.client].push(t.resolutionHours||0); });
+  const topCats = {};
+  d.forEach(t=>{ if(!topCats[t.client])topCats[t.client]={}; topCats[t.client][t.category||'?']=(topCats[t.client][t.category||'?']||0)+1; });
+
+  document.getElementById('client-insights').innerHTML = clAgg.slice(0,3).map((c,i)=>{
+    const avg = Math.round(clRes[c[0]].reduce((a,b)=>a+b,0)/clRes[c[0]].length);
+    const pct = Math.round(c[1]/grandTotal*100);
+    const mainCat = Object.entries(topCats[c[0]]).sort((a,b)=>b[1]-a[1])[0][0];
+    return `<div class="insight fade-up">
+      <div class="insight-icon" style="background:rgba(255,255,255,0.05);border:1px solid var(--border2);font-size:20px">${rankIcons[i]}</div>
+      <div style="flex:1;min-width:0">
+        <div class="insight-title" style="font-size:14px;font-family:var(--display);color:${rankColors[i]}">${c[0]}</div>
+        <div class="insight-desc">Principal categoria: <strong style="color:${CAT_COLORS[mainCat]||'#718096'}">${mainCat}</strong> · Média de resolução: ${avg}h</div>
+        <div style="display:flex;gap:12px;margin-top:6px">
+          <span class="insight-val" style="color:${rankColors[i]};font-size:20px;font-family:var(--display);font-weight:700">${c[1]}</span>
+          <span style="font-size:11px;color:var(--muted2);align-self:flex-end;padding-bottom:2px">tickets &nbsp;·&nbsp; ${pct}% do total</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── TICKETS PAGE ──
+function renderTicketsPage() {
+  const d = getFiltered();
+  document.getElementById('table-count').textContent = d.length+' registros';
+
+  // subcat bars
+  const scAgg = agg(d,'subCategory').slice(0,10);
+  const scMax = scAgg[0]?scAgg[0][1]:1;
+  const scColors=['#00d4ff','#00e5a0','#ffb800','#9b6dff','#ff8c42','#ff6b9d','#4ecdc4','#ffd93d','#6bcb77','#845ec2'];
+  document.getElementById('subcat-list').innerHTML = scAgg.map((s,i)=>`
+    <div class="subcat-row">
+      <span class="subcat-name" title="${s[0]}">${s[0]}</span>
+      <div class="subcat-bar-wrap"><div class="subcat-bar" style="width:${Math.round(s[1]/scMax*100)}%;background:${scColors[i%scColors.length]}"></div></div>
+      <span class="subcat-count">${s[1]}</span>
+    </div>`).join('');
+
+  // cat chart
+  const catAgg = agg(d,'category').slice(0,12);
+  mkChart('cCat2',{type:'bar',indexAxis:'y',
+    data:{labels:catAgg.map(a=>a[0]),datasets:[{data:catAgg.map(a=>a[1]),
+      backgroundColor:catAgg.map(a=>CAT_COLORS[a[0]]||'#4a5568'),borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{ticks:{color:tc,font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+
+  // table
+  const tbody = document.getElementById('tickets-tbody');
+  tbody.innerHTML = d.map(t=>{
+    const h=t.resolutionHours||0;
+    const hcls = h<24?'h-fast':h<168?'h-mid':'h-slow';
+    const hLabel = h<24?h.toFixed(1)+'h':h<48?(h/24).toFixed(1)+'d':(h/24).toFixed(0)+'d';
+    const bcls = t.priority==='Alta'?'b-alta':t.priority==='Média'?'b-media':'b-sem';
+    return `<tr>
+      <td><span class="tid">#${t.id}</span></td>
+      <td title="${t.subject}" style="max-width:220px">${t.subject}</td>
+      <td style="font-size:11px"><span style="color:${CAT_COLORS[t.category]||'#4a5568'}">${t.category}</span></td>
+      <td style="font-weight:500">${t.client}</td>
+      <td><span class="badge ${bcls}">${t.priority}</span></td>
+      <td style="color:var(--muted2);font-family:var(--mono);font-size:10px">${t.createdTime}</td>
+      <td style="color:var(--muted2);font-family:var(--mono);font-size:10px">${t.closedTime}</td>
+      <td><span class="${hcls}">${hLabel}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── CLIENTS PAGE ──
+function renderClientsPage() {
+  const d = DATA;
+  const clAgg = agg(d,'client');
+  const clMax = clAgg[0]?clAgg[0][1]:1;
+  document.getElementById('client-top-val').textContent = clAgg[0]?clAgg[0][0]+' ('+clAgg[0][1]+')':'—';
+
+  // client list
+  document.getElementById('client-list').innerHTML = clAgg.slice(0,15).map((c,i)=>{
+    const clientData = d.filter(t=>t.client===c[0]);
+    const times = clientData.map(t=>t.resolutionHours||0);
+    const avg = times.reduce((a,b)=>a+b,0)/times.length;
+    return `<div class="client-row">
+      <span class="c-rank">${String(i+1).padStart(2,'0')}</span>
+      <span class="c-name" title="${c[0]}">${c[0]}</span>
+      <div class="c-bar-wrap"><div class="c-bar" style="width:${Math.round(c[1]/clMax*100)}%"></div></div>
+      <span class="c-count">${c[1]}</span>
+      <span class="c-avg" title="Média de resolução">${Math.round(avg)}h</span>
+    </div>`;
+  }).join('');
+
+  // client bar chart top 10
+  const top10 = clAgg.slice(0,10);
+  mkChart('cClients',{type:'bar',
+    data:{labels:top10.map(a=>a[0]),datasets:[{data:top10.map(a=>a[1]),
+      backgroundColor:'rgba(0,212,255,0.7)',borderColor:'#00d4ff',borderWidth:1,
+      borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+' tickets'}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:10},maxRotation:30},grid:{display:false}},
+        y:{ticks:{color:tc,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+
+  // client avg resolution
+  const clRes = {};
+  d.forEach(t=>{ if(!clRes[t.client])clRes[t.client]=[]; clRes[t.client].push(t.resolutionHours||0); });
+  const clAvgArr = Object.entries(clRes)
+    .filter(([,v])=>v.length>=2)
+    .map(([k,v])=>([k,Math.round(v.reduce((a,b)=>a+b,0)/v.length)]))
+    .sort((a,b)=>b[1]-a[1]).slice(0,10);
+  mkChart('cClientRes',{type:'bar',indexAxis:'y',
+    data:{labels:clAvgArr.map(a=>a[0]),datasets:[{data:clAvgArr.map(a=>a[1]),
+      backgroundColor:clAvgArr.map(([,v])=>v>300?'#ff4757':v>150?'#ffb800':'#00e5a0'),
+      borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}h em média`}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},
+          title:{display:true,text:'Horas médias',color:tc,font:{size:9}}},
+        y:{ticks:{color:tc,font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+
+  // populate select
+  const sel = document.getElementById('client-select');
+  sel.innerHTML = '<option value="">Selecione um cliente...</option>' +
+    clAgg.map(c=>`<option value="${c[0]}">${c[0]} (${c[1]} tickets)</option>`).join('');
+}
+
+let clientCatChart = null;
+function updateClientCat() {
+  const client = document.getElementById('client-select').value;
+  if(!client) return;
+  const d = DATA.filter(t=>t.client===client);
+  const catAgg = agg(d,'category');
+  if(clientCatChart) clientCatChart.destroy();
+  const ctx = document.getElementById('cClientCat');
+  if(!ctx) return;
+  clientCatChart = new Chart(ctx,{type:'doughnut',
+    data:{labels:catAgg.map(a=>a[0]),datasets:[{data:catAgg.map(a=>a[1]),
+      backgroundColor:catAgg.map(a=>CAT_COLORS[a[0]]||'#4a5568'),borderWidth:0,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'50%',
+      plugins:{legend:{position:'right',labels:{color:tc,font:{size:10},boxWidth:10}}}}
+  });
+}
+
+// ── TEMPO PAGE ──
+function renderTempoPage() {
+  const d = DATA;
+  const times = d.map(t=>t.resolutionHours||0);
+  const bkts = [0,0,0,0];
+  times.forEach(h=>{
+    if(h<24)bkts[0]++;else if(h<72)bkts[1]++;else if(h<336)bkts[2]++;else bkts[3]++;
+  });
+  document.getElementById('sla-day').textContent = bkts[0];
+  document.getElementById('sla-3d').textContent = bkts[1];
+  document.getElementById('sla-14d').textContent = bkts[2];
+  document.getElementById('sla-over').textContent = bkts[3];
+
+  // avg by category
+  const catRes = {};
+  d.forEach(t=>{
+    const c=t.category||'Outro';
+    if(!catRes[c])catRes[c]=[];
+    catRes[c].push(t.resolutionHours||0);
+  });
+  const catAvg = Object.entries(catRes)
+    .map(([k,v])=>([k,Math.round(v.reduce((a,b)=>a+b,0)/v.length)]))
+    .sort((a,b)=>b[1]-a[1]).slice(0,10);
+  mkChart('cCatRes',{type:'bar',indexAxis:'y',
+    data:{labels:catAvg.map(a=>a[0]),datasets:[{data:catAvg.map(a=>a[1]),
+      backgroundColor:catAvg.map(([,v])=>v>400?'#ff4757':v>200?'#ffb800':'#00e5a0'),
+      borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}h em média`}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},
+          title:{display:true,text:'Horas',color:tc,font:{size:9}}},
+        y:{ticks:{color:tc,font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+
+  // scatter
+  const scatterData = d.map((t,i)=>({
+    x:i+1, y:t.resolutionHours||0,
+    label:t.id, cat:t.category||'Outro', client:t.client
+  }));
+  const catGroups = {};
+  scatterData.forEach(p=>{
+    if(!catGroups[p.cat])catGroups[p.cat]=[];
+    catGroups[p.cat].push({x:p.x,y:p.y,label:p.label,client:p.client});
+  });
+  mkChart('cScatter',{type:'scatter',
+    data:{datasets:Object.entries(catGroups).map(([cat,pts])=>({
+      label:cat,data:pts,
+      backgroundColor:(CAT_COLORS[cat]||'#4a5568')+'aa',
+      pointRadius:5,pointHoverRadius:7
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{
+        label:ctx=>`#${ctx.raw.label} · ${ctx.raw.client} · ${Math.round(ctx.raw.y)}h`
+      }}},
+      scales:{
+        x:{display:false},
+        y:{ticks:{color:tc,font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},
+          title:{display:true,text:'Horas de resolução',color:tc,font:{size:9}}}
+      }
+    }
+  });
+
+  // slowest tickets
+  const slowest = [...d].sort((a,b)=>(b.resolutionHours||0)-(a.resolutionHours||0)).slice(0,10);
+  document.getElementById('slowest-tbody').innerHTML = slowest.map(t=>{
+    const h=t.resolutionHours||0;
+    const days=(h/24).toFixed(0);
+    return `<tr>
+      <td><span class="tid">#${t.id}</span></td>
+      <td title="${t.subject}" style="max-width:240px">${t.subject}</td>
+      <td style="font-weight:500">${t.client}</td>
+      <td><span style="color:${CAT_COLORS[t.category]||'#4a5568'};font-size:11px">${t.category}</span></td>
+      <td style="color:var(--muted2);font-family:var(--mono);font-size:10px">${t.createdTime}</td>
+      <td style="color:var(--muted2);font-family:var(--mono);font-size:10px">${t.closedTime}</td>
+      <td><span class="h-slow">${days} dias (${Math.round(h)}h)</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PAGE NAV ──
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='clientes') renderClientsPage();
+  if(id==='tempo') renderTempoPage();
+  if(id==='tickets') renderTicketsPage();
+}
+
+// ── INIT ──
+renderOverview();
+renderTicketsPage();
+
+function updateClock(){
+  document.getElementById('footer-time').textContent =
+    'Exportado do Zoho Desk · Atualizado '+new Date().toLocaleString('pt-BR');
+}
+updateClock();
+setInterval(updateClock,60000);
+</script>
+</body>
+</html>
